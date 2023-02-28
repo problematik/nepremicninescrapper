@@ -1,5 +1,5 @@
 import { getPage, killCookieConsent } from './browser'
-import { AddContents, Ads } from './db'
+import { AdContents, Ads } from './db'
 
 /**
  * @param {import('./db').Ad} ad 
@@ -12,7 +12,7 @@ export async function scrapeAd(ad) {
   await killCookieConsent(page)
 
   console.log('Saving to db')
-  await AddContents().insert({
+  await AdContents().insert({
     ad_id: ad.id,
     html_contents: await page.content(),
   })

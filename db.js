@@ -61,7 +61,7 @@ export const Notifications = () => knex('notifications')
  *
  * @returns {import('knex').Knex.QueryBuilder<AdContent ,AdContent | AdContent[]}>}
  */
-export const AddContents = () => knex('ad_contents')
+export const AdContents = () => knex('ad_contents')
 
 /**
  * @typedef {Object} Place

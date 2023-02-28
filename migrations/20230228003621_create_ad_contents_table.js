@@ -18,5 +18,5 @@ export const up = function(knex) {
  * @returns { Promise<void> }
  */
 export const down = function(knex) {
-  return knex.schema.dropTableIfExists('add_contents')
+  return knex.schema.dropTableIfExists('ad_contents')
 };
