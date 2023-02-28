@@ -36,3 +36,15 @@ export const Notifications = () => knex('notifications')
  * @returns {import('knex').Knex.QueryBuilder<AdContent ,AdContent | AdContent[]}>}
  */
 export const AddContents = () => knex('ad_contents')
+
+/**
+ * @typedef {Object} Place
+ * @property {number} id
+ * @property {string} name
+ * @property {import('@googlemaps/google-maps-services-js').Place} contents
+ * @property {import('@googlemaps/google-maps-services-js').Distance} distance
+ * @property {Date} created_at
+ *
+ * @returns {import('knex').Knex.QueryBuilder<Place ,Place | Place[]}>}
+ */
+export const Places = () => knex('places')
