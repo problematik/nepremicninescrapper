@@ -7,7 +7,7 @@ export const up = function(knex) {
     t.bigIncrements('id', { primaryKey: true })
     t.string('name', 500).notNullable().unique()
     t.jsonb('contents').notNullable()
-    t.json('distance')
+    t.jsonb('distance')
     t.timestamp('created_at').notNullable().defaultTo(knex.fn.now())
   })
 };

@@ -5,8 +5,15 @@ import isObject from 'lodash/isObject'
 const env = process.env.NODE_ENV || 'development'
 
 function handleRow(row) {
-  if(row && row.hasOwnProperty('contents') && !isObject(row.contents)) {
-    row.contents = JSON.parse(row.contents)
+  const properties = ['contents', 'distance']
+  if(!row || !isObject(row)) {
+    return row
+  }
+
+  for(const property of properties) {
+    if(row.hasOwnProperty(property) && !isObject(row[property])) {
+      row[property] = JSON.parse(row[property])
+    }
   }
 
   return row
@@ -50,7 +57,7 @@ export const Notifications = () => knex('notifications')
  * @typedef {Object} AdContent
  * @property {number} id
  * @property {number} ad_id
- * @property {Object} contents
+ * @property {string} html_contents
  *
  * @returns {import('knex').Knex.QueryBuilder<AdContent ,AdContent | AdContent[]}>}
  */
