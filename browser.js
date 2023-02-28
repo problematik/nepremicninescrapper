@@ -37,11 +37,13 @@ export async function getBrowser() {
 /**
  * @returns {Promise<import('puppeteer').Page>}
  */
-export async function getPage() {
+export async function getPage(randomWait = true) {
   const browser = await getBrowser()
   const page = await browser.newPage()
   
-  await page.waitForTimeout((Math.floor(Math.random() * 12) + 5) * 1000) 
+  if(randomWait) {
+    await page.waitForTimeout((Math.floor(Math.random() * 12) + 5) * 1000) 
+  }
   
   await page.setViewport({width: 1280, height: 720})
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36')
