@@ -1,0 +1,22 @@
+{
+  "type": "module",
+  "scripts": {
+    "dev": "node --es-module-specifier-resolution=node .",
+    "db:migrate": "npx knex migrate:latest",
+    "db:migrate:prod": "npx knex migrate:latest --env production",
+    "db:rollback": "npx knex migrate:rollback"
+  },
+  "dependencies": {
+    "knex": "^2.4.2",
+    "pg": "^8.9.0",
+    "puppeteer": "19.7.2",
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-adblocker": "^2.13.5",
+    "puppeteer-extra-plugin-stealth": "^2.11.1"
+  },
+  "devDependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.27",
+    "better-sqlite3": "^8.1.0",
+    "lodash": "^4.17.21"
+  }
+}
