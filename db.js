@@ -1,11 +1,30 @@
 import knexfile from './knexfile'
 import knexInit from 'knex'
+import isObject from 'lodash/isObject'
+
 const env = process.env.NODE_ENV || 'development'
+
+function handleRow(row) {
+  if(row && row.hasOwnProperty('contents') && !isObject(row.contents)) {
+    row.contents = JSON.parse(row.contents)
+  }
+
+  return row
+}
 
 /**
  * @type {import('knex').Knex}
  */
-export const knex = knexInit(knexfile[env])
+export const knex = knexInit({
+  ...knexfile[env],
+  postProcessResponse: function (result, queryContext) {
+    if(Array.isArray(result)) {
+      return result.map(handleRow)
+    }
+
+    return handleRow(result)
+  }
+})
 
 /**
  * @typedef {Object} Ad
