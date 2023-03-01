@@ -95,6 +95,8 @@ async function evaluatePage(urlGenerator) {
 
   console.log('Finished with', { url })
 
+  await page.close()
+
   async function advance(url) {
     console.log('Navigating to URL')
     await page.goto(url)

@@ -17,10 +17,14 @@ export async function parse(ad, adContents) {
   if(!stillActive) {
     console.log('Ad no longer active')
     await markNotified(ad)
+    await page.close()
     return false
   }
 
-  return extractInfo()
+  const content = await extractInfo()
+  await page.close()
+
+  return content
 
   async function isStillActive() {
     const $el = await page.waitForSelector('#vsebina760', { timeout: 1000}).catch(_ => false)
