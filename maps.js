@@ -7,7 +7,7 @@ const client = new Client({})
 export async function getDistance(place) {
   const [targetPlace, home] = await Promise.all([
     findPlace(place),
-    findPlace('Ljubljana')
+    findPlace(process.env.HOME_ADDRESS)
   ])
 
   const distance = await findDistance(targetPlace, home)
