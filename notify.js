@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { AdContents, Ads } from './db'
+import { AdContents, Ads, knex, Notifications } from './db'
 import { parse } from './parse'
 
 export async function adToSlack(ad, contents) {
@@ -77,12 +77,14 @@ export async function sendToSlack(channel, text, attachments, emoji = ':sleuth_o
   })
 }
 
-export async function notify() {
-  const adContents = await AdContents()
+function getPendingAds() {
+  return AdContents()
     .select('ad_contents.*')
     .leftJoin('notifications', 'notifications.ad_id', 'ad_contents.ad_id')
     .whereNull('notifications.id')
-    .where('ad_contents.ad_id', '>=', '13')
+}
+export async function notify() {
+  const adContents = await getPendingAds()
 
   if(!adContents.length) {
     console.log('No ads to fetch')
@@ -112,3 +114,16 @@ export async function markNotified(ad) {
   })
 }
 
+
+export async function markAllNotified() {
+  const ads = await Ads()
+    .select('ads.id')
+    .leftJoin('notifications', 'notifications.ad_id', 'ads.id')
+    .whereNull('notifications.id')
+
+  const adIds = ads.map(ad => ({ ad_id: ad.id }))
+  console.log('Updating ads as seen', adIds.length)
+
+  if(!adIds.length) return
+  return knex.batchInsert('notifications',  adIds)
+}

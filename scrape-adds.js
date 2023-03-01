@@ -28,6 +28,9 @@ export async function scrape() {
     join.on('ads.id', 'ad_contents.ad_id')
   })
   .whereNull('ad_contents.id')
+  // skip all ready marked as seen ads
+  .leftJoin('notifications', 'ads.id', 'notifications.id')
+  .whereNull('notifications.id')
 
   if(!ads.length) {
     console.log('No ads to scrape found')
