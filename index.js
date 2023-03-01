@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 
 import { scrape as getAdds} from './get-ads'
-import { scrape as scrapeAds} from './scrape-adds'
+import { scrape as scrapeAds} from './scrape-ads'
 import { markAllNotified, notify } from './notify'
 import http from 'http'
 
