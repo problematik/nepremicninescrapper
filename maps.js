@@ -4,22 +4,7 @@ import get from 'lodash/get'
 
 const client = new Client({})
 
-function extractPlace(placeText) {
-  const obcina = placeText.match(/Ob.ina: (.*)$/)
-  if(obcina) {
-    return obcina[1]
-  }
-
-  const upravnaEnota = placeText.match(/Upravna enota: (.*)( \||$)/)
-  if(upravnaEnota) {
-    return upravnaEnota[1]
-  }
-
-  throw new Error(`Unable to find place for ${placeText}`)
-}
-
-export async function getDistance(placeText) {
-  const place = extractPlace(placeText)
+export async function getDistance(place) {
   const [targetPlace, home] = await Promise.all([
     findPlace(place),
     findPlace('Ljubljana')
