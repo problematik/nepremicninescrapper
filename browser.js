@@ -45,6 +45,10 @@ export async function getPage(randomWait = true) {
   const browser = await getBrowser()
   const page = await browser.newPage()
   
+  if(process.env.RENDER) {
+    page.setDefaultNavigationTimeout(60 * 1000)
+  }
+
   if(randomWait) {
     await page.waitForTimeout((Math.floor(Math.random() * 12) + 5) * 1000) 
   }
