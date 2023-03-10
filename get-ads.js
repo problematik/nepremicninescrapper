@@ -42,17 +42,17 @@ async function getNumberOfTotalPages(page) {
  * @param {import('puppeteer').Page} page
  */
 async function extractUrls(page) {
-  console.log('Searching for adds', { url: page.url()})
+  console.log('Searching for ads', { url: page.url()})
   const ads = await page.$$('div[itemprop=item] > h2 > a')
   const links = await Promise.all(ads.map(ad => ad.evaluate(el => el.href)))
   if(!links.length) {
     console.log('No links found on page')
     return false
   }
-  const existingAddLinks = await Ads().whereIn('link', links)
+  const existingAdLinks = await Ads().whereIn('link', links)
     .then(ads => ads.map(ad => ad.link))
 
-  const newLinks = difference(links, existingAddLinks)
+  const newLinks = difference(links, existingAdLinks)
   if(!newLinks.length) {
     console.log('No new links found')
     return false

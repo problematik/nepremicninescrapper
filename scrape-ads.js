@@ -40,7 +40,7 @@ export async function scrape() {
 
   console.log('Found ads to scrape', ads.length)
   for(let i = 0; i < ads.length; i++) {
-    console.log('Doing add', i +1, 'of', ads.length)
+    console.log('Doing ad', i +1, 'of', ads.length)
     const ad = ads[i]
     await scrapeAd(ad)
       .catch(handleAdScrapeError.bind(null, ad))
