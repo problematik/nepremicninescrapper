@@ -74,7 +74,7 @@ app
     console.error(err)
   })
 
-http.createServer(app.callback()).listen(9988, () => {
+http.createServer(app.callback()).listen(process.env.PORT || 9988, () => {
   console.log('Server up and running')
 })
 

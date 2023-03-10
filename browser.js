@@ -27,8 +27,12 @@ export async function killBrowser() {
 export async function getBrowser() {
   if(browser) return browser
 
+  const args = process.env.RENDER
+    ? ['--no-sandbox', '--disable-setuid-sandbox']
+    : []
+
   return new Promise(resolve => {
-    puppeteer.launch({headless: true, executablePath: executablePath() }).then(async browser => {
+    puppeteer.launch({headless: true, executablePath: executablePath(), args }).then(async browser => {
       resolve(browser)
     })
   })
