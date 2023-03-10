@@ -8,7 +8,7 @@ services:
   - type: web
     name: nepremicninedb
     env: node
-    buildCommand: "npm i --only=prod && npm run db:migrate:prod"
+    buildCommand: "npm i --only=prod && npm run db:migrate:prod && ./render-build.sh"
     startCommand: "npm run dev"
     region: frankfurt
     plan: free
