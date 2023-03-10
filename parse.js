@@ -1,5 +1,4 @@
 import { getPage } from "./browser"
-import { Notifications } from "./db"
 import { getDistance } from "./maps"
 import { markNotified } from "./notify"
 
@@ -27,7 +26,7 @@ export async function parse(ad, adContents) {
   return content
 
   async function isStillActive() {
-    const $el = await page.waitForSelector('#vsebina760', { timeout: 1000}).catch(_ => false)
+    const $el = await page.waitForSelector('#vsebina760', { timeout: 1000}).catch(() => false)
     if(!$el) return true
     const $p = await $el.evaluate(el => el.querySelector('p').textContent)
     return $p !== 'Oglas ni več aktiven.'
@@ -114,7 +113,7 @@ export async function parse(ad, adContents) {
     }
 
     async function extractM2() {
-      let $attribute = await page.waitForSelector('#atributi #icon-33', { timeout: 1000 }).catch(_ => false)
+      let $attribute = await page.waitForSelector('#atributi #icon-33', { timeout: 1000 }).catch(() => false)
       if($attribute) {
         const m2 = await $attribute.evaluate(el => el.nextSibling.textContent)
         const m2Match = m2.match(/Velikost: (.*?) m/)

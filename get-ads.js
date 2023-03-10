@@ -1,4 +1,4 @@
-import { getPage, killCookieConsent, killBrowser } from './browser'
+import { getPage, killCookieConsent } from './browser'
 import { Ads, knex } from './db'
 import difference from 'lodash/difference'
 import { sendToSlack } from './notify'
@@ -11,7 +11,7 @@ async function getNumberOfTotalPages(page) {
   console.log('Searching for last page indicator')
   let lastPage = await page
     .waitForSelector('.paging_last > a', { timeout: 1000 })
-    .catch(_ => false)
+    .catch(() => false)
 
   let pages = 1
   if(!lastPage) {
@@ -25,7 +25,7 @@ async function getNumberOfTotalPages(page) {
     return pages
   }
 
-  const [_ ,__ , val, val2] = matches
+  const [ , , val, val2] = matches
   const value = [val, val2].filter(v => v)
   if(!value) {
     console.log('Matches found but no value found')

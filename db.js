@@ -11,7 +11,7 @@ function handleRow(row) {
   }
 
   for(const property of properties) {
-    if(row.hasOwnProperty(property) && !isObject(row[property])) {
+    if(Object.prototype.hasOwnProperty.call(row, property) && !isObject(row[property])) {
       row[property] = JSON.parse(row[property])
     }
   }
@@ -24,7 +24,7 @@ function handleRow(row) {
  */
 export const knex = knexInit({
   ...knexfile[env],
-  postProcessResponse: function (result, queryContext) {
+  postProcessResponse: function (result) {
     if(Array.isArray(result)) {
       return result.map(handleRow)
     }

@@ -12,27 +12,27 @@ import Router from 'koa-router'
 const app = new Koa();
 const router = new Router();
 
-router.post('/get-ads', async (ctx, next) => {
+router.post('/get-ads', async (ctx) => {
   await getAdds()
   ctx.response.body = 'Done!'
 })
 
-router.post('/mark-notified', async (ctx, next) => {
+router.post('/mark-notified', async (ctx) => {
   await markAllNotified()
   ctx.response.body = 'Done!'
 })
 
-router.post('/scrape-ads', async(ctx, next) => {
+router.post('/scrape-ads', async(ctx) => {
   await scrapeAds()
   ctx.response.body = 'Done!'
 })
 
-router.post('/notify', async(ctx, next) => {
+router.post('/notify', async(ctx) => {
   await notify()
   ctx.response.body = 'Done!'
 })
 
-router.post('/500', async(ctx, next) => {
+router.post('/500', async(ctx) => {
   ctx.response.status = 500
 })
 
@@ -70,7 +70,7 @@ app
   })
   .use(router.routes())
   .use(router.allowedMethods())
-  .on('error', (err, ctx) => {
+  .on('error', (err) => {
     console.error(err)
   })
 

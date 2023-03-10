@@ -3,7 +3,7 @@ import { AdContents, AdErrors, Ads, knex, Notifications } from './db'
 import { parse } from './parse'
 
 export async function adToSlack(ad, contents) {
-  const { distance, m2, images, shortDescription, price, type, seller, place } = contents
+  const { distance, m2, images, shortDescription, price, type, place } = contents
 
   const attachments = [
     {
