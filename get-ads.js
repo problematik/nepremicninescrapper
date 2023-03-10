@@ -10,7 +10,7 @@ import { sendToSlack } from './notify'
 async function getNumberOfTotalPages(page) {
   console.log('Searching for last page indicator')
   let lastPage = await page
-    .waitForSelector('.paging_last > a', { timeout: 1000 })
+    .waitForSelector('.paging_last > a', { timeout: 10000 })
     .catch(() => false)
 
   let pages = 1
@@ -95,7 +95,7 @@ async function evaluatePage(urlGenerator) {
     if(!nextPage) break;
 
     if(currentPage < pages) {
-      await new Promise(resolve => setTimeout(resolve, 5000))
+      await new Promise(resolve => setTimeout(resolve, 10000))
 
       await advance(urlGenerator(currentPage + 1))
     }

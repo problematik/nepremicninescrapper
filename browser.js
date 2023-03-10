@@ -79,7 +79,7 @@ export async function getPage(randomWait = true) {
  * @param {import('puppeteer').Page} page 
  */
 export async function killCookieConsent(page) {
-  const found = await page.waitForSelector('.CybotCookiebotDialogContentWrapper', { timeout: 5000 }).catch(() => false)
+  const found = await page.waitForSelector('.CybotCookiebotDialogContentWrapper', { timeout: 10000 }).catch(() => false)
   if(!found) return
 
   await page.click('#CybotCookiebotDialogBodyButtonDecline')  

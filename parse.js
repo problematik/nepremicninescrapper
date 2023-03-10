@@ -26,14 +26,14 @@ export async function parse(ad, adContents) {
   return content
 
   async function isStillActive() {
-    const $el = await page.waitForSelector('#vsebina760', { timeout: 1000}).catch(() => false)
+    const $el = await page.waitForSelector('#vsebina760', { timeout: 10000}).catch(() => false)
     if(!$el) return true
     const $p = await $el.evaluate(el => el.querySelector('p').textContent)
     return $p !== 'Oglas ni več aktiven.'
   }
 
   async function extractInfo() {
-    const $more_info = await page.waitForSelector('.more_info', { timeout: 1000 })
+    const $more_info = await page.waitForSelector('.more_info', { timeout: 10000 })
     const moreInfo = await $more_info.evaluate(el => el.textContent)
 
     const place = extractPlace(moreInfo)
@@ -70,7 +70,7 @@ export async function parse(ad, adContents) {
     }
 
     async function extractImagesPaths() {
-      const $gallery = await page.waitForSelector('#galerija .rsThumbsContainer', { timeout: 1000 })
+      const $gallery = await page.waitForSelector('#galerija .rsThumbsContainer', { timeout: 10000 })
       const childImages = await $gallery.evaluate(el => Array.from(el.children).map(el => el.querySelector('img').src))
       if(childImages.length === 0) {
         throw new Error('Images not found')
@@ -113,7 +113,7 @@ export async function parse(ad, adContents) {
     }
 
     async function extractM2() {
-      let $attribute = await page.waitForSelector('#atributi #icon-33', { timeout: 1000 }).catch(() => false)
+      let $attribute = await page.waitForSelector('#atributi #icon-33', { timeout: 10000 }).catch(() => false)
       if($attribute) {
         const m2 = await $attribute.evaluate(el => el.nextSibling.textContent)
         const m2Match = m2.match(/Velikost: (.*?) m/)
@@ -138,7 +138,7 @@ export async function parse(ad, adContents) {
     }
   }
   async function extractPrice() {
-    const $price = await page.waitForSelector('.cena', { timeout: 1000 })
+    const $price = await page.waitForSelector('.cena', { timeout: 10000 })
     let price = await $price.evaluate(el => el.textContent)
     price = price.trim()
     
