@@ -4,7 +4,8 @@
     "dev": "node --es-module-specifier-resolution=node .",
     "db:migrate": "npx knex migrate:latest",
     "db:migrate:prod": "npx knex migrate:latest --env production",
-    "db:rollback": "npx knex migrate:rollback"
+    "db:rollback": "npx knex migrate:rollback",
+    "test": "npx eslint *.js"
   },
   "dependencies": {
     "knex": "^2.4.2",
@@ -21,7 +22,8 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "better-sqlite3": "^8.1.0"
+    "better-sqlite3": "^8.1.0",
+    "eslint": "^8.35.0"
   },
   "engines": {
     "node": ">=14 <15"
