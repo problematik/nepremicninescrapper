@@ -74,3 +74,13 @@ export const AdContents = () => knex('ad_contents')
  * @returns {import('knex').Knex.QueryBuilder<Place ,Place | Place[]}>}
  */
 export const Places = () => knex('places')
+
+/**
+ * @typedef {Object} AdError
+ * @property {number} id
+ * @property {number} ad_id
+ * @property {'scrape'|'parse'} type
+ *
+ * @returns {import('knex').Knex.QueryBuilder<AdError ,AdError | AdError[]}>}
+ */
+export const AdErrors = () => knex('ad_errors')

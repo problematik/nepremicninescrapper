@@ -1,5 +1,6 @@
 import { getPage, killCookieConsent } from './browser'
-import { AdContents, Ads } from './db'
+import { AdContents, AdErrors, Ads } from './db'
+import { sendToSlack } from './notify'
 
 /**
  * @param {import('./db').Ad} ad 
@@ -42,5 +43,21 @@ export async function scrape() {
     console.log('Doing add', i +1, 'of', ads.length)
     const ad = ads[i]
     await scrapeAd(ad)
+      .catch(handleAdScrapeError.bind(null, ad))
   }
+}
+
+async function handleAdScrapeError(ad, err) {
+  console.error(err)
+  const existing = await AdErrors()
+    .where({ ad_id: ad.id, type: 'scrape' })
+    .first()
+
+  if(existing) {
+    console.log('Skipping ad scrape error notification')
+    return  
+  }
+
+  await sendToSlack(process.env.SLACK_CHANNEL, `Ad scrape error ${err.message}`, undefined, ':hammer_and_wrench:')
+  await AdErrors().insert({ ad_id: ad.id, type: 'scrape' })
 }
