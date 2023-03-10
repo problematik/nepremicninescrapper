@@ -32,6 +32,10 @@ router.post('/notify', async(ctx, next) => {
   ctx.response.body = 'Done!'
 })
 
+router.post('/500', async(ctx, next) => {
+  ctx.response.status = 500
+})
+
 process.on("unhandledRejection", reason => {
   // I just caught an unhandled promise rejection,
   // let's throw it here so my central error handler can catch it
