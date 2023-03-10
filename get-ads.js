@@ -1,10 +1,11 @@
 import { getPage, killCookieConsent, killBrowser } from './browser'
 import { Ads, knex } from './db'
 import difference from 'lodash/difference'
+import { sendToSlack } from './notify'
 
 /**
- * 
- * @param {import('puppeteer').Page} page 
+ *
+ * @param {import('puppeteer').Page} page
  */
 async function getNumberOfTotalPages(page) {
   console.log('Searching for last page indicator')
@@ -16,7 +17,7 @@ async function getNumberOfTotalPages(page) {
   if(!lastPage) {
     console.log('Selector not found. Assuming no pages')
     return pages
-  } 
+  }
   const pageContent = await lastPage.evaluate(el => el.href)
   const matches = pageContent.match(/(\/(\d+)$|(\d+)\/\?s=16$)/)
   if(!matches) {
@@ -37,8 +38,8 @@ async function getNumberOfTotalPages(page) {
 }
 
 /**
- * 
- * @param {import('puppeteer').Page} page 
+ *
+ * @param {import('puppeteer').Page} page
  */
 async function extractUrls(page) {
   console.log('Searching for adds', { url: page.url()})
@@ -84,6 +85,13 @@ async function evaluatePage(urlGenerator) {
 
   for(let currentPage = 1; currentPage <= pages; currentPage++) {
     const nextPage = await extractUrls(page)
+      .catch(async err => {
+        console.error('Failed to extract urls')
+        console.error(err)
+        await sendToSlack(process.env.SLACK_CHANNEL, `Error encountered ${err.message}`, undefined, ':firecracker:')
+
+        throw err
+      })
     if(!nextPage) break;
 
     if(currentPage < pages) {
