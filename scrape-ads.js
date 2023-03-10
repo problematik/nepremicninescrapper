@@ -7,9 +7,12 @@ import { sendToSlack } from './notify'
  */
 export async function scrapeAd(ad) {
   console.log('Scraping ad', ad.link)
+  console.log('Get page')
   const page = await getPage(false)
+  console.log('Navigating to page')
   await page.goto(ad.link)
 
+  console.log('Killing cookie consent')
   await killCookieConsent(page)
 
   console.log('Saving to db')
@@ -18,6 +21,7 @@ export async function scrapeAd(ad) {
     html_contents: await page.content(),
   })
 
+  console.log('Closing page')
   await page.close()
   console.log('Done')
 }
