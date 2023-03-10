@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { AdContents, Ads, knex, Notifications } from './db'
+import { AdContents, AdErrors, Ads, knex, Notifications } from './db'
 import { parse } from './parse'
 
 export async function adToSlack(ad, contents) {
@@ -94,11 +94,8 @@ export async function notify() {
   for(let i = 0; i < adContents.length; i++) {
     const adContent = adContents[i]
     const ad = await Ads().where({id: adContent.ad_id}).first()
-    const contents = await parse(ad, adContent).catch(err => {
-      console.log('Failed to parse add')
-      console.error(err)
-      return false
-    })
+    const contents = await parse(ad, adContent)
+      .catch(handleAdParseError.bind(null, ad))
     if(!contents) continue
     
     
@@ -106,6 +103,22 @@ export async function notify() {
     await adToSlack(ad, contents)
     await markNotified(ad)
   }
+}
+
+async function handleAdParseError(ad, err) {
+  console.error('Failed to parse ad')
+  console.error(err)
+
+  const alreadyNotified = await AdErrors()
+    .where({ ad_id: ad.id, type: 'parse' })
+    .first()
+
+  if(!alreadyNotified) {
+    await sendToSlack(process.env.SLACK_CHANNEL, `Failed to parse error ${err.message}`, undefined, ':hammer_and_wrench:')
+    await AdErrors().insert({ ad_id: ad.id, type: 'parse' })
+  }
+
+  return false
 }
 
 export async function markNotified(ad) {
