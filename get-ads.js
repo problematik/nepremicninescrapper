@@ -43,8 +43,7 @@ async function getNumberOfTotalPages(page) {
  */
 async function extractUrls(page) {
   console.log('Searching for ads', { url: page.url()})
-  const ads = await page.$$('div[itemprop=item] > h2 > a')
-  const links = await Promise.all(ads.map(ad => ad.evaluate(el => el.href)))
+  const links = await getAdLinks()
   if(!links.length) {
     console.log('No links found on page')
     return false
@@ -69,6 +68,17 @@ async function extractUrls(page) {
   await knex.batchInsert('ads', rows, 100)
 
   return true
+
+  async function getAdLinks() {
+    const ads1 = await page.$$('div[itemprop=item] > .property-image > a:first-child')
+    const links1 = await Promise.all(ads1.map(ad => ad.evaluate(el => el.href)))
+    if(links1.length) return links1
+    const ads2 = await page.$$('div[itemprop=item] > .property-details')
+    const links2 = await Promise.all(ads2.map(ad => ad.evaluate(el => el.dataset['href'])))
+    if(links2.length) return links2
+    const ads3 = await page.$$('div[itemprop=item] > .property-details > a:first-child')
+    return Promise.all(ads3.map(ad => ad.evaluate(el => el.href)))
+  }
 }
 
 async function evaluatePage(urlGenerator) {
