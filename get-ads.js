@@ -1,4 +1,4 @@
-import { getPage, killCookieConsent } from './browser'
+import { getPage, killCookieConsent, checkIfBlocked } from './browser'
 import { Ads, knex } from './db'
 import difference from 'lodash/difference'
 import { sendToSlack } from './notify'
@@ -111,6 +111,8 @@ async function evaluatePage(urlGenerator) {
 
     console.log('Killing cookie consent')
     await killCookieConsent(page)
+
+    await checkIfBlocked()
   }
 }
 

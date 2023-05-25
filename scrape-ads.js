@@ -1,4 +1,4 @@
-import { getPage, killCookieConsent } from './browser'
+import { getPage, killCookieConsent, checkIfBlocked } from './browser'
 import { AdContents, AdErrors, Ads } from './db'
 import { sendToSlack } from './notify'
 
@@ -14,6 +14,8 @@ export async function scrapeAd(ad) {
 
   console.log('Killing cookie consent')
   await killCookieConsent(page)
+
+  await checkIfBlocked()
 
   console.log('Saving to db')
   await AdContents().insert({
