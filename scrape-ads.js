@@ -15,7 +15,7 @@ export async function scrapeAd(ad) {
   console.log('Killing cookie consent')
   await killCookieConsent(page)
 
-  await checkIfBlocked()
+  await checkIfBlocked(page)
 
   console.log('Saving to db')
   await AdContents().insert({

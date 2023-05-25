@@ -112,7 +112,7 @@ async function evaluatePage(urlGenerator) {
     console.log('Killing cookie consent')
     await killCookieConsent(page)
 
-    await checkIfBlocked()
+    await checkIfBlocked(page)
   }
 }
 
