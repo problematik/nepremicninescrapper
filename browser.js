@@ -3,6 +3,25 @@ import puppeteer from 'puppeteer-extra'
 import pluginStealth from 'puppeteer-extra-plugin-stealth'
 import adBlocker from 'puppeteer-extra-plugin-adblocker'
 
+let proxyList
+if(process.env.PROXY_LIST) {
+  const list = process.env.PROXY_LIST.split(',')
+  proxyList = list.map(entry => {
+    const [, host, usernamePassword] = entry.match(/(.*\d+):(.*)$/)
+    const [username, password] = usernamePassword.split(':')
+    return {
+      host,
+      username,
+      password
+    }
+  })
+}
+
+function proxyRotate() {
+  proxyList.push(proxyList.shift());
+  return proxyList
+}
+
 puppeteer.use(pluginStealth())
 puppeteer.use(adBlocker({
   blockTrackers: true,
@@ -21,7 +40,7 @@ export async function killBrowser() {
 }
 
 /**
- * 
+ *
  * @returns {Promise<import('puppeteer').Browser>}
  */
 export async function getBrowser() {
@@ -41,9 +60,30 @@ export async function getBrowser() {
 /**
  * @returns {Promise<import('puppeteer').Page>}
  */
-export async function getPage(randomWait = true) {
+async function newPage() {
   const browser = await getBrowser()
-  const page = await browser.newPage()
+  if(proxyList) {
+    console.log('newPage - using proxy')
+    const proxy = proxyRotate()[0]
+    const context = await browser.createIncognitoBrowserContext({ proxyServer: `https://${proxy.host}` })
+    const page = await context.newPage()
+    await page.authenticate({
+      password: proxy.password,
+      username: proxy.username
+    })
+
+    return page
+  }
+
+  console.log('newPage - without proxy')
+  return browser.newPage()
+}
+
+/**
+ * @returns {Promise<import('puppeteer').Page>}
+ */
+export async function getPage(randomWait = true) {
+  const page = await newPage()
   
   if(process.env.RENDER) {
     page.setDefaultNavigationTimeout(60 * 1000)
