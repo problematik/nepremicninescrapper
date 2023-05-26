@@ -4,12 +4,15 @@ import { markNotified } from "./notify"
 import { logtail } from './utils/log'
 
 /**
- * 
- * @param {import('./db').Ad} ad 
- * @param {import('./db').AdContent} adContents 
+ *
+ * @param {import('./db').Ad} ad
+ * @param {import('./db').AdContent} adContents
  */
 export async function parse(ad, adContents) {
-  logtail.info('Handling', ad.id, ad.link)
+  logtail.info('Handling ad', {
+    id: ad.id,
+    link: ad.link
+  })
   const page = await getPage(false)
   await page.setContent(adContents.html_contents)
 
@@ -46,7 +49,7 @@ export async function parse(ad, adContents) {
       extractShortDescription(),
       extractPrice(),
       extractSeller()
-    ]) 
+    ])
 
     return {
       place,
@@ -93,12 +96,12 @@ export async function parse(ad, adContents) {
       if(obcina) {
         return obcina[1]
       }
-    
+
       const upravnaEnota = moreInfo.match(/Upravna enota: (.*)( \||$)/)
       if(upravnaEnota) {
         return upravnaEnota[1]
       }
-    
+
       throw new Error(`Unable to find place for ${moreInfo}`)
     }
 
@@ -142,12 +145,12 @@ export async function parse(ad, adContents) {
     const $price = await page.waitForSelector('.cena', { timeout: 10000 })
     let price = await $price.evaluate(el => el.textContent)
     price = price.trim()
-    
+
     const eurosMatch = price.match(/(?<price>(\d+.)?\d+(,\d+)?) €/)
     if(!eurosMatch) {
       throw new Error('Unable to parse euros from price')
     }
-    
+
     let euros = eurosMatch.groups.price
     euros = Number.parseFloat(euros.replace(/\./g, ''), 10)
 

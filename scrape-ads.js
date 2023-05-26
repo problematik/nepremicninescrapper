@@ -7,7 +7,9 @@ import { logtail } from './utils/log'
  * @param {import('./db').Ad} ad 
  */
 export async function scrapeAd(ad) {
-  logtail.info('Scraping ad', ad.link)
+  logtail.info('Scraping ad', {
+    link: ad.link
+  })
   logtail.info('Get page')
   const page = await getPage(false)
   logtail.info('Navigating to page')
@@ -45,9 +47,9 @@ export async function scrape() {
     return 
   }
 
-  logtail.info('Found ads to scrape', ads.length)
+  logtail.info(`Found ads to scrape: ${ads.length}`)
   for(let i = 0; i < ads.length; i++) {
-    logtail.info('Doing ad', i +1, 'of', ads.length)
+    logtail.info(`Doing ad ${i +1} of ${ads.length}`)
     const ad = ads[i]
     await scrapeAd(ad)
       .catch(handleAdScrapeError.bind(null, ad))

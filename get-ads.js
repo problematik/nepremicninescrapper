@@ -92,7 +92,7 @@ async function evaluatePage(urlGenerator) {
 
   const pages = await getNumberOfTotalPages(page)
 
-  logtail.info('In total there are', pages, 'page/s')
+  logtail.info(`In total there are ${pages} page/s`)
 
   for(let currentPage = 1; currentPage <= pages; currentPage++) {
     const nextPage = await extractUrls(page)
