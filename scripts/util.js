@@ -4,7 +4,7 @@ import { logtail } from '../utils/log'
 
 export function execute(fn) {
   fn().then(() => {
-    logtail.log('Done')
+    logtail.info('Done')
     logtail.flush()
     process.exit(0)
   })

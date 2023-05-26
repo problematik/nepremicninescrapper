@@ -9,32 +9,32 @@ import { logtail } from './utils/log'
  * @param {import('puppeteer').Page} page
  */
 async function getNumberOfTotalPages(page) {
-  logtail.log('Searching for last page indicator')
+  logtail.info('Searching for last page indicator')
   let lastPage = await page
     .waitForSelector('.paging_last > a', { timeout: 10000 })
     .catch(() => false)
 
   let pages = 1
   if(!lastPage) {
-    logtail.log('Selector not found. Assuming no pages')
+    logtail.info('Selector not found. Assuming no pages')
     return pages
   }
   const pageContent = await lastPage.evaluate(el => el.href)
   const matches = pageContent.match(/(\/(\d+)$|(\d+)\/\?s=16$)/)
   if(!matches) {
-    logtail.log('Selector found but no matches found')
+    logtail.info('Selector found but no matches found')
     return pages
   }
 
   const [ , , val, val2] = matches
   const value = [val, val2].filter(v => v)
   if(!value) {
-    logtail.log('Matches found but no value found')
+    logtail.info('Matches found but no value found')
     return pages
   }
 
   const lastPageNumber = Number.parseInt(value, 10)
-  logtail.log('Last page content', lastPageNumber)
+  logtail.info('Last page content', lastPageNumber)
   return lastPageNumber
 }
 
@@ -43,10 +43,10 @@ async function getNumberOfTotalPages(page) {
  * @param {import('puppeteer').Page} page
  */
 async function extractUrls(page) {
-  logtail.log('Searching for ads', { url: page.url()})
+  logtail.info('Searching for ads', { url: page.url()})
   const links = await getAdLinks()
   if(!links.length) {
-    logtail.log('No links found on page')
+    logtail.info('No links found on page')
     return false
   }
   const existingAdLinks = await Ads().whereIn('link', links)
@@ -54,7 +54,7 @@ async function extractUrls(page) {
 
   const newLinks = difference(links, existingAdLinks)
   if(!newLinks.length) {
-    logtail.log('No new links found')
+    logtail.info('No new links found')
     return false
   }
 
@@ -65,7 +65,7 @@ async function extractUrls(page) {
     return memo
   }, [])
 
-  logtail.log('Inserting ads', { num: rows.length })
+  logtail.info('Inserting ads', { num: rows.length })
   await knex.batchInsert('ads', rows, 100)
 
   return true
@@ -85,14 +85,14 @@ async function extractUrls(page) {
 async function evaluatePage(urlGenerator) {
   const url = urlGenerator(false)
 
-  logtail.log('Starting url', { url })
+  logtail.info('Starting url', { url })
   const page = await getPage()
 
   await advance(url)
 
   const pages = await getNumberOfTotalPages(page)
 
-  logtail.log('In total there are', pages, 'page/s')
+  logtail.info('In total there are', pages, 'page/s')
 
   for(let currentPage = 1; currentPage <= pages; currentPage++) {
     const nextPage = await extractUrls(page)
@@ -112,15 +112,15 @@ async function evaluatePage(urlGenerator) {
     }
   }
 
-  logtail.log('Finished with', { url })
+  logtail.info('Finished with', { url })
 
   await page.close()
 
   async function advance(url) {
-    logtail.log('Navigating to URL')
+    logtail.info('Navigating to URL')
     await page.goto(url)
 
-    logtail.log('Killing cookie consent')
+    logtail.info('Killing cookie consent')
     await killCookieConsent(page)
 
     await checkIfBlocked(page)

@@ -67,13 +67,13 @@ export async function sendToSlack(channel, text, attachments, emoji = ':sleuth_o
     attachments
   }
 
-  logtail.log('Sending slack notification')
+  logtail.info('Sending slack notification')
 
   return axios.post(
     process.env.SLACK_WEBHOOK,
     payload
   ).catch(err => {
-    logtail.log('Unable to send slack notification')
+    logtail.info('Unable to send slack notification')
     logtail.error(err)
   })
 }
@@ -88,7 +88,7 @@ export async function notify() {
   const adContents = await getPendingAds()
 
   if(!adContents.length) {
-    logtail.log('No ads to fetch')
+    logtail.info('No ads to fetch')
     return
   }
 
@@ -136,7 +136,7 @@ export async function markAllNotified() {
     .whereNull('notifications.id')
 
   const adIds = ads.map(ad => ({ ad_id: ad.id }))
-  logtail.log('Updating ads as seen', adIds.length)
+  logtail.info('Updating ads as seen', adIds.length)
 
   if(!adIds.length) return
   return knex.batchInsert('notifications',  adIds)

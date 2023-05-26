@@ -76,6 +76,6 @@ app
   })
 
 http.createServer(app.callback()).listen(process.env.PORT || 9988, () => {
-  logtail.log('Server up and running')
+  logtail.info('Server up and running')
 })
 

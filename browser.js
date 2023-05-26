@@ -64,7 +64,7 @@ export async function getBrowser() {
 async function newPage() {
   const browser = await getBrowser()
   if(proxyList) {
-    logtail.log('newPage - using proxy')
+    logtail.info('newPage - using proxy')
     const proxy = proxyRotate()[0]
     const context = await browser.createIncognitoBrowserContext({ proxyServer: `https://${proxy.host}` })
     const page = await context.newPage()
@@ -76,7 +76,7 @@ async function newPage() {
     return page
   }
 
-  logtail.log('newPage - without proxy')
+  logtail.info('newPage - without proxy')
   return browser.newPage()
 }
 

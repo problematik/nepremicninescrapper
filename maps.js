@@ -61,7 +61,7 @@ async function findPlace(place) {
 
   const contents = get(results, 'data.results[0]', false)
   if(!contents) {
-    logtail.log(JSON.stringify(results.data))
+    logtail.info(JSON.stringify(results.data))
     logtail.error('Found place but not correct data returned?')
     throw new Error('Unable to parse received data')
   }

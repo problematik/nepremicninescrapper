@@ -9,13 +9,13 @@ import { logtail } from './utils/log'
  * @param {import('./db').AdContent} adContents 
  */
 export async function parse(ad, adContents) {
-  logtail.log('Handling', ad.id, ad.link)
+  logtail.info('Handling', ad.id, ad.link)
   const page = await getPage(false)
   await page.setContent(adContents.html_contents)
 
   const stillActive = await isStillActive()
   if(!stillActive) {
-    logtail.log('Ad no longer active')
+    logtail.info('Ad no longer active')
     await markNotified(ad)
     await page.close()
     return false
