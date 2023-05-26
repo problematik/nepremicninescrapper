@@ -1,13 +1,14 @@
 import * as dotenv from 'dotenv' 
 dotenv.config()
+import { logtail } from '../utils/log'
 
 export function execute(fn) {
   fn().then(() => {
-    console.log('Done')
+    logtail.log('Done')
     process.exit(0)
   })
   .catch(err => {
-      console.error(err)
+      logtail.error(err)
       process.exit(1)
   })
 }

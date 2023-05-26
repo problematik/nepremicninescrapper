@@ -2,38 +2,39 @@ import { getPage, killCookieConsent, checkIfBlocked } from './browser'
 import { Ads, knex } from './db'
 import difference from 'lodash/difference'
 import { sendToSlack } from './notify'
+import { logtail } from './utils/log'
 
 /**
  *
  * @param {import('puppeteer').Page} page
  */
 async function getNumberOfTotalPages(page) {
-  console.log('Searching for last page indicator')
+  logtail.log('Searching for last page indicator')
   let lastPage = await page
     .waitForSelector('.paging_last > a', { timeout: 10000 })
     .catch(() => false)
 
   let pages = 1
   if(!lastPage) {
-    console.log('Selector not found. Assuming no pages')
+    logtail.log('Selector not found. Assuming no pages')
     return pages
   }
   const pageContent = await lastPage.evaluate(el => el.href)
   const matches = pageContent.match(/(\/(\d+)$|(\d+)\/\?s=16$)/)
   if(!matches) {
-    console.log('Selector found but no matches found')
+    logtail.log('Selector found but no matches found')
     return pages
   }
 
   const [ , , val, val2] = matches
   const value = [val, val2].filter(v => v)
   if(!value) {
-    console.log('Matches found but no value found')
+    logtail.log('Matches found but no value found')
     return pages
   }
 
   const lastPageNumber = Number.parseInt(value, 10)
-  console.log('Last page content', lastPageNumber)
+  logtail.log('Last page content', lastPageNumber)
   return lastPageNumber
 }
 
@@ -42,10 +43,10 @@ async function getNumberOfTotalPages(page) {
  * @param {import('puppeteer').Page} page
  */
 async function extractUrls(page) {
-  console.log('Searching for ads', { url: page.url()})
+  logtail.log('Searching for ads', { url: page.url()})
   const links = await getAdLinks()
   if(!links.length) {
-    console.log('No links found on page')
+    logtail.log('No links found on page')
     return false
   }
   const existingAdLinks = await Ads().whereIn('link', links)
@@ -53,7 +54,7 @@ async function extractUrls(page) {
 
   const newLinks = difference(links, existingAdLinks)
   if(!newLinks.length) {
-    console.log('No new links found')
+    logtail.log('No new links found')
     return false
   }
 
@@ -64,7 +65,7 @@ async function extractUrls(page) {
     return memo
   }, [])
 
-  console.log('Inserting ads', { num: rows.length })
+  logtail.log('Inserting ads', { num: rows.length })
   await knex.batchInsert('ads', rows, 100)
 
   return true
@@ -84,20 +85,20 @@ async function extractUrls(page) {
 async function evaluatePage(urlGenerator) {
   const url = urlGenerator(false)
 
-  console.log('Starting url', { url })
+  logtail.log('Starting url', { url })
   const page = await getPage()
 
   await advance(url)
 
   const pages = await getNumberOfTotalPages(page)
 
-  console.log('In total there are', pages, 'page/s')
+  logtail.log('In total there are', pages, 'page/s')
 
   for(let currentPage = 1; currentPage <= pages; currentPage++) {
     const nextPage = await extractUrls(page)
       .catch(async err => {
-        console.error('Failed to extract urls')
-        console.error(err)
+        logtail.error('Failed to extract urls')
+        logtail.error(err)
         await sendToSlack(process.env.SLACK_CHANNEL, `Error encountered ${err.message}`, undefined, ':firecracker:')
 
         throw err
@@ -111,15 +112,15 @@ async function evaluatePage(urlGenerator) {
     }
   }
 
-  console.log('Finished with', { url })
+  logtail.log('Finished with', { url })
 
   await page.close()
 
   async function advance(url) {
-    console.log('Navigating to URL')
+    logtail.log('Navigating to URL')
     await page.goto(url)
 
-    console.log('Killing cookie consent')
+    logtail.log('Killing cookie consent')
     await killCookieConsent(page)
 
     await checkIfBlocked(page)

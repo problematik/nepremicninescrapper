@@ -1,31 +1,32 @@
 import { getPage, killCookieConsent, checkIfBlocked } from './browser'
 import { AdContents, AdErrors, Ads } from './db'
 import { sendToSlack } from './notify'
+import { logtail } from './utils/log'
 
 /**
  * @param {import('./db').Ad} ad 
  */
 export async function scrapeAd(ad) {
-  console.log('Scraping ad', ad.link)
-  console.log('Get page')
+  logtail.log('Scraping ad', ad.link)
+  logtail.log('Get page')
   const page = await getPage(false)
-  console.log('Navigating to page')
+  logtail.log('Navigating to page')
   await page.goto(ad.link)
 
-  console.log('Killing cookie consent')
+  logtail.log('Killing cookie consent')
   await killCookieConsent(page)
 
   await checkIfBlocked(page)
 
-  console.log('Saving to db')
+  logtail.log('Saving to db')
   await AdContents().insert({
     ad_id: ad.id,
     html_contents: await page.content(),
   })
 
-  console.log('Closing page')
+  logtail.log('Closing page')
   await page.close()
-  console.log('Done')
+  logtail.log('Done')
 }
 
 export async function scrape() {
@@ -40,13 +41,13 @@ export async function scrape() {
   .whereNull('notifications.id')
 
   if(!ads.length) {
-    console.log('No ads to scrape found')
+    logtail.log('No ads to scrape found')
     return 
   }
 
-  console.log('Found ads to scrape', ads.length)
+  logtail.log('Found ads to scrape', ads.length)
   for(let i = 0; i < ads.length; i++) {
-    console.log('Doing ad', i +1, 'of', ads.length)
+    logtail.log('Doing ad', i +1, 'of', ads.length)
     const ad = ads[i]
     await scrapeAd(ad)
       .catch(handleAdScrapeError.bind(null, ad))
@@ -54,13 +55,13 @@ export async function scrape() {
 }
 
 async function handleAdScrapeError(ad, err) {
-  console.error(err)
+  logtail.error(err)
   const existing = await AdErrors()
     .where({ ad_id: ad.id, type: 'scrape' })
     .first()
 
   if(existing) {
-    console.log('Skipping ad scrape error notification')
+    logtail.log('Skipping ad scrape error notification')
     return  
   }
 

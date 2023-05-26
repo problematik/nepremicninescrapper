@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv' 
 dotenv.config()
 
+import { logtail } from './utils/log'
 import { scrape as getAdds} from './get-ads'
 import { scrape as scrapeAds} from './scrape-ads'
 import { markAllNotified, notify } from './notify'
@@ -40,15 +41,15 @@ process.on("unhandledRejection", reason => {
   // I just caught an unhandled promise rejection,
   // let's throw it here so my central error handler can catch it
   // throw new Error(reason);
-  console.error(reason)
-  console.error('Error caught unhadled rejection...')
+  logtail.error(reason)
+  logtail.error('Error caught unhandled rejection...')
 });
 
 process.on('uncaughtException', reason => {
   // I just received an error that was never handled, time to handle it
   // by throwing it so my error handling middleware can catch it
-  console.error(reason)
-  console.error('Error caught unhadled rejection...')
+  logtail.error(reason)
+  logtail.error('Error caught unhandled rejection...')
 });
 
 app
@@ -71,10 +72,10 @@ app
   .use(router.routes())
   .use(router.allowedMethods())
   .on('error', (err) => {
-    console.error(err)
+    logtail.error(err)
   })
 
 http.createServer(app.callback()).listen(process.env.PORT || 9988, () => {
-  console.log('Server up and running')
+  logtail.log('Server up and running')
 })
 

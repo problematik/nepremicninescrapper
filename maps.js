@@ -1,6 +1,7 @@
 import { Client } from '@googlemaps/google-maps-services-js'
 import { Places } from './db'
 import get from 'lodash/get'
+import { logtail } from './utils/log'
 
 const client = new Client({})
 
@@ -31,7 +32,7 @@ async function findDistance(place, home) {
     }
   })
   .catch(err => {
-    console.error(err)
+    logtail.error(err)
     throw new Error('failed to find distance')
   })
 
@@ -54,14 +55,14 @@ async function findPlace(place) {
     }
   })
   .catch(err => {
-    console.error(err)
+    logtail.error(err)
     throw new Error('failed to find place')
   })
 
   const contents = get(results, 'data.results[0]', false)
   if(!contents) {
-    console.log(JSON.stringify(results.data))
-    console.error('Found place but not correct data returned?')
+    logtail.log(JSON.stringify(results.data))
+    logtail.error('Found place but not correct data returned?')
     throw new Error('Unable to parse received data')
   }
 

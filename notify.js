@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { AdContents, AdErrors, Ads, knex, Notifications } from './db'
 import { parse } from './parse'
+import { logtail } from './utils/log'
 
 export async function adToSlack(ad, contents) {
   const { distance, m2, images, shortDescription, price, type, place } = contents
@@ -66,14 +67,14 @@ export async function sendToSlack(channel, text, attachments, emoji = ':sleuth_o
     attachments
   }
 
-  console.log('Sending slack notification')
+  logtail.log('Sending slack notification')
 
   return axios.post(
     process.env.SLACK_WEBHOOK,
     payload
   ).catch(err => {
-    console.log('Unable to send slack notification')
-    console.error(err)
+    logtail.log('Unable to send slack notification')
+    logtail.error(err)
   })
 }
 
@@ -87,7 +88,7 @@ export async function notify() {
   const adContents = await getPendingAds()
 
   if(!adContents.length) {
-    console.log('No ads to fetch')
+    logtail.log('No ads to fetch')
     return
   }
 
@@ -106,8 +107,8 @@ export async function notify() {
 }
 
 async function handleAdParseError(ad, err) {
-  console.error('Failed to parse ad')
-  console.error(err)
+  logtail.error('Failed to parse ad')
+  logtail.error(err)
 
   const alreadyNotified = await AdErrors()
     .where({ ad_id: ad.id, type: 'parse' })
@@ -135,7 +136,7 @@ export async function markAllNotified() {
     .whereNull('notifications.id')
 
   const adIds = ads.map(ad => ({ ad_id: ad.id }))
-  console.log('Updating ads as seen', adIds.length)
+  logtail.log('Updating ads as seen', adIds.length)
 
   if(!adIds.length) return
   return knex.batchInsert('notifications',  adIds)

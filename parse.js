@@ -1,6 +1,7 @@
 import { getPage } from "./browser"
 import { getDistance } from "./maps"
 import { markNotified } from "./notify"
+import { logtail } from './utils/log'
 
 /**
  * 
@@ -8,13 +9,13 @@ import { markNotified } from "./notify"
  * @param {import('./db').AdContent} adContents 
  */
 export async function parse(ad, adContents) {
-  console.log('Handling', ad.id, ad.link)
+  logtail.log('Handling', ad.id, ad.link)
   const page = await getPage(false)
   await page.setContent(adContents.html_contents)
 
   const stillActive = await isStillActive()
   if(!stillActive) {
-    console.log('Ad no longer active')
+    logtail.log('Ad no longer active')
     await markNotified(ad)
     await page.close()
     return false

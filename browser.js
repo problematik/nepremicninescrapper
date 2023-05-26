@@ -2,6 +2,7 @@ import { executablePath } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import pluginStealth from 'puppeteer-extra-plugin-stealth'
 import adBlocker from 'puppeteer-extra-plugin-adblocker'
+import { logtail } from './utils/log'
 
 let proxyList
 if(process.env.PROXY_LIST) {
@@ -63,7 +64,7 @@ export async function getBrowser() {
 async function newPage() {
   const browser = await getBrowser()
   if(proxyList) {
-    console.log('newPage - using proxy')
+    logtail.log('newPage - using proxy')
     const proxy = proxyRotate()[0]
     const context = await browser.createIncognitoBrowserContext({ proxyServer: `https://${proxy.host}` })
     const page = await context.newPage()
@@ -75,7 +76,7 @@ async function newPage() {
     return page
   }
 
-  console.log('newPage - without proxy')
+  logtail.log('newPage - without proxy')
   return browser.newPage()
 }
 
