@@ -1,4 +1,4 @@
-import { getPage, killCookieConsent, checkIfBlocked } from './browser'
+import { getPage, killCookieConsent, checkIfBlocked, optimizeNavigation } from './browser'
 import { AdContents, AdErrors, Ads } from './db'
 import { sendToSlack } from './notify'
 import { logtail } from './utils/log'
@@ -13,7 +13,7 @@ export async function scrapeAd(ad) {
   logtail.info('Get page')
   const page = await getPage(false)
   logtail.info('Navigating to page')
-  await page.goto(ad.link)
+  await optimizeNavigation(page, ad.link)
 
   logtail.info('Killing cookie consent')
   await killCookieConsent(page)

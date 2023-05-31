@@ -1,4 +1,4 @@
-import { getPage, killCookieConsent, checkIfBlocked } from './browser'
+import { getPage, killCookieConsent, checkIfBlocked, optimizeNavigation } from './browser'
 import { Ads, knex } from './db'
 import difference from 'lodash/difference'
 import { sendToSlack } from './notify'
@@ -118,7 +118,7 @@ async function evaluatePage(urlGenerator) {
 
   async function advance(url) {
     logtail.info('Navigating to URL')
-    await page.goto(url)
+    await optimizeNavigation(page, url)
 
     logtail.info('Killing cookie consent')
     await killCookieConsent(page)
