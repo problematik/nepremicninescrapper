@@ -74,8 +74,8 @@ export async function parse(ad, adContents) {
     }
 
     async function extractImagesPaths() {
-      const $gallery = await page.waitForSelector('#galerija .rsThumbsContainer', { timeout: 10000 })
-      const childImages = await $gallery.evaluate(el => Array.from(el.children).map(el => el.querySelector('img').src))
+      const $gallery = await page.waitForSelector('#galerija', { timeout: 10000 })
+      const childImages = await $gallery.evaluate(el => Array.from(el.querySelectorAll('a[data-rsbigimg]')).map(el => el.querySelector('img').dataset['src']))
       if(childImages.length === 0) {
         throw new Error('Images not found')
       }
