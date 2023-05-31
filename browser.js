@@ -104,15 +104,6 @@ export async function getPage(randomWait = true) {
     'accept-language': 'en-US,en;q=0.9,en;q=0.8'
   });
 
-  await page.setRequestInterception(true);
-  page.on('request', async (request) => {
-    if (request.resourceType() == 'image') {
-      await request.abort();
-    } else {
-      await request.continue();
-    }
-  });
-
   return page
 }
 
@@ -147,5 +138,105 @@ export async function checkIfBlocked(page) {
 
   function throwBlocked() {
     throw new Error('Blocked!')
+  }
+}
+
+/**
+ *
+ * @param {import('puppeteer').Page} page
+ * @param {string} url
+ */
+export async function optimizeNavigation(page, url) {
+  let bytes = 0
+  const requestCount = new Set()
+  const fullRequests = new Map()
+  const devTools = await page.target().createCDPSession();
+
+  await devTools.send("Network.enable");
+
+  await devTools.send('Network.setCacheDisabled', {
+    cacheDisabled: false
+  })
+
+  await devTools.send('Network.setRequestInterception', {
+    patterns: [
+      { resourceType: 'Stylesheet' },
+      { resourceType: 'Font' },
+      { resourceType: 'Image' },
+      { resourceType: 'Script' },
+      { resourceType: 'Media' }
+    ]
+  })
+
+  devTools.on('Network.requestWillBeSent', event => {
+    logtail.debug('Request sending', {
+      requestId: event.requestId,
+      url: event.request.url
+    })
+
+    fullRequests.set(event.requestId, event.request);
+    requestCount.add(event.requestId)
+  })
+
+  devTools.on('Network.requestIntercepted', async event => {
+    logtail.debug('Intercepted request', {
+      requestId: event.requestId,
+      url: event.request.url
+    })
+
+    await devTools.send('Network.continueInterceptedRequest', {
+      interceptionId: event.interceptionId,
+      errorReason: 'Aborted'
+    })
+  })
+
+  devTools.on('Network.loadingFailed', event => {
+    requestCount.delete(event.requestId)
+  })
+
+
+  devTools.on("Network.loadingFinished", event => {
+    bytes+=event.encodedDataLength
+    requestCount.delete(event.requestId)
+  })
+
+
+  logtail.debug('Devtools hooks registered - navigating', { url })
+  await page.goto(url)
+  logtail.debug('Page navigated, waiting for requests')
+  await waitForAllResponses()
+  logtail.info('Fetched all requests', {
+    size: niceBytes(bytes),
+    url
+  })
+
+  await devTools.detach()
+
+  async function waitForAllResponses(iteration = 0) {
+    if(requestCount.size <= 0) return
+    logtail.info('Total requests pending', { requests: requestCount.size })
+
+    if(iteration === 5) {
+      for(const item of requestCount.keys()) {
+        const request = fullRequests.get(item)
+        logtail.debug('Waiting for', request.url)
+      }
+      throw new Error('Max wait time reached')
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 5000))
+    return waitForAllResponses(iteration + 1)
+  }
+   
+  function niceBytes(x){
+    const units = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+
+    let l = 0, n = parseInt(x, 10) || 0;
+
+    while(n >= 1024 && ++l){
+        n = n/1024;
+    }
+    
+    return(n.toFixed(n < 10 && l > 0 ? 1 : 0) + ' ' + units[l]);
   }
 }
