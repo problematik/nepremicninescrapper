@@ -165,7 +165,9 @@ export async function optimizeNavigation(page, url) {
       { resourceType: 'Image' },
       { resourceType: 'Script' },
       { resourceType: 'Media' },
-      { resourceType: '*nepremicnine.click*' }
+      { urlPattern: '*nepremicnine.click*' },
+      { urlPattern: '*facebook*' },
+      { urlPattern: '*onenepremicnine.net*' }
     ]
   })
 
