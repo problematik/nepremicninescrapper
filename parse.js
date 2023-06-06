@@ -82,6 +82,13 @@ export async function parse(ad, adContents) {
 
       const images = []
       for(const image of childImages) {
+        if(!image) {
+          logtail.warn('Image is not valid', {
+            image
+          })
+
+          continue
+        }
         const isNoImagePlaceholder = image.match(/n-1.jpg$/)
         if(isNoImagePlaceholder) continue
 
