@@ -17,6 +17,18 @@ if(process.env.PROXY_LIST) {
     }
   })
 }
+if(process.env.PROXY_LIST_V2) {
+  const list = process.env.PROXY_LIST_V2.split(',')
+  proxyList = list.map(entry => {
+    const [usernamePassword, host ] = entry.split('@')
+    const [username, password] = usernamePassword.split(':')
+    return {
+      host,
+      username,
+      password
+    }
+  })
+}
 
 function proxyRotate() {
   proxyList.push(proxyList.shift());
@@ -66,7 +78,10 @@ async function newPage() {
   if(proxyList) {
     logtail.info('newPage - using proxy')
     const proxy = proxyRotate()[0]
-    const context = await browser.createIncognitoBrowserContext({ proxyServer: `https://${proxy.host}` })
+    const config = process.env.PROXY_LIST
+      ? { proxyServer: `https://${proxy.host}` }
+      : { proxyServer: proxy.host }
+    const context = await browser.createIncognitoBrowserContext(config)
     const page = await context.newPage()
     await page.authenticate({
       password: proxy.password,
