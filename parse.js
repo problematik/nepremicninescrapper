@@ -53,7 +53,7 @@ export async function parse(ad, adContents) {
 
     return {
       place,
-      distance,
+      distance: parseInt(distance, 10),
       m2,
       images,
       shortDescription,

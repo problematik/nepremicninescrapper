@@ -3,6 +3,8 @@ import { AdContents, AdErrors, Ads, knex, Notifications } from './db'
 import { parse } from './parse'
 import { logtail } from './utils/log'
 
+const MAX_DISTANCE = process.env.MAX_DISTANCE || 22
+
 export async function adToSlack(ad, contents) {
   const { distance, m2, images, shortDescription, price, type, place } = contents
 
@@ -99,9 +101,12 @@ export async function notify() {
       .catch(handleAdParseError.bind(null, ad))
     if(!contents) continue
     
-    
 
-    await adToSlack(ad, contents)
+    if(contents.distance < MAX_DISTANCE) {
+      await adToSlack(ad, contents)
+    } else {
+      logtail.info('Skipping notification as distance is too great', { adId: ad.id, distance: contents.distance })
+    }
     await markNotified(ad)
   }
 }
