@@ -59,7 +59,7 @@ export const Notifications = () => knex('notifications')
  * @property {number} ad_id
  * @property {string} html_contents
  *
- * @returns {import('knex').Knex.QueryBuilder<AdContent ,AdContent | AdContent[]}>}
+ * @returns {import('knex').Knex.QueryBuilder<AdContent, AdContent | AdContent[]}>}
  */
 export const AdContents = () => knex('ad_contents')
 
@@ -71,7 +71,7 @@ export const AdContents = () => knex('ad_contents')
  * @property {import('@googlemaps/google-maps-services-js').Distance} distance
  * @property {Date} created_at
  *
- * @returns {import('knex').Knex.QueryBuilder<Place ,Place | Place[]}>}
+ * @returns {import('knex').Knex.QueryBuilder<Place, Place | Place[]}>}
  */
 export const Places = () => knex('places')
 
