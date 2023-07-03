@@ -81,6 +81,38 @@ export const Places = () => knex('places')
  * @property {number} ad_id
  * @property {'scrape'|'parse'} type
  *
- * @returns {import('knex').Knex.QueryBuilder<AdError ,AdError | AdError[]}>}
+ * @returns {import('knex').Knex.QueryBuilder<AdError, AdError | AdError[]}>}
  */
 export const AdErrors = () => knex('ad_errors')
+
+/**
+ * @typedef {Object} AdSearcher
+ * @property {number} id
+ * @property {string} searcher
+ * @property {string?} slack_channel
+ * @property {string?} slack_color
+ *
+ * @returns {import('knex').Knex.QueryBuilder<AdSearcher, AdSearcher | AdSearcher[]}>}
+ */
+export const AdSearchers = () => knex('ad_searchers')
+
+/**
+ * @typedef {Object} AdConfigs
+ * @property {number} id
+ * @property {number} ad_searcher_id
+ * @property {string} link
+ * @property {string?} distance_from
+ * @property {number?} max_distance
+ *
+ * @returns {import('knex').Knex.QueryBuilder<AdConfigs, AdConfigs | AdConfigs[]}>}
+ */
+export const AdConfigs = () => knex('ad_configs')
+
+/**
+ * @typedef {Object} AdConfig
+ * @property {number} ad_id
+ * @property {number} ad_config_id
+ *
+ * @returns {import('knex').Knex.QueryBuilder<AdConfig, AdConfig | AdConfig[]}>}
+ */
+export const AdConfig = () => knex('ad_config')
