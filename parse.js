@@ -51,6 +51,10 @@ export async function parse(ad, adContents) {
       extractSeller()
     ])
 
+    if(price.type === 'person') {
+      return null
+    }
+
     return {
       place,
       distance: parseInt(distance, 10),
@@ -166,6 +170,13 @@ export async function parse(ad, adContents) {
       return {
         price: euros,
         type: 'month'
+      }
+    }
+
+    if(price.match(/€\/osebo/)) {
+      return {
+        price: euros,
+        type: 'person'
       }
     }
 
